@@ -1,11 +1,14 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import TabsPage from '../views/TabsPage.vue'; // Asegúrate que la T y P sean mayúsculas
+import TabsPage from '../views/TabsPage.vue'; 
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    redirect: '/login'
+    
+
+redirect: '/tabs/tab1'
+
   },
   {
     path: '/login',
