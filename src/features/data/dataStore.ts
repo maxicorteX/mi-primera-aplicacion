@@ -3,19 +3,26 @@ import { defineStore } from 'pinia';
 export const useDataStore = defineStore('miStore', {
   state: () => ({
     usuarios: [] as any[],
-    posts: [] as any[],
+    token: '', // 
     cargando: false
   }),
   actions: {
-    async obtenerDatos() {
+    // Funciones p para el Login de la Actividad 3 :,3
+    async login(credenciales: any) {
       this.cargando = true;
       try {
-        const [resUsers, resPosts] = await Promise.all([
-          fetch('https://jsonplaceholder.typicode.com'),
-          fetch('https://jsonplaceholder.typicode.com')
-        ]);
-        this.usuarios = await resUsers.json();
-        this.posts = await resPosts.json();
+        const res = await fetch('https://reqres.in', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credenciales)
+        });
+        const data = await res.json();
+        if (data.token) {
+          this.token = data.token; 
+          return { success: true };
+        } else {
+          return { success: false, error: data.error };
+        }
       } finally {
         this.cargando = false;
       }

@@ -1,38 +1,44 @@
 <template>
   <ion-app>
     <ion-content class="ion-padding">
-      <h1>Consumo de APIs con Pinia</h1>
-      
-      <ion-button @click="store.obtenerDatos()" :disabled="store.cargando">
-        {{ store.cargando ? 'Cargando...' : 'Cargar Datos de APIs' }}
-      </ion-button>
-
-      <div v-if="store.usuarios.length > 0">
-        <h2>Usuarios ({{ store.usuarios.length }})</h2>
-        <ul>
-          <li v-for="user in store.usuarios.slice(0, 5)" :key="user.id">
-            {{ user.name }}
-          </li >
-        </ul>
+      <div style="text-align: center; margin-top: 40px;">
+        <ion-icon name="person-circle" style="font-size: 80px;"></ion-icon>
+        <h1>Actividad 3: Login</h1>
       </div>
 
-      <div v-if="store.posts.length > 0">
-        <h2>Posts ({{ store.posts.length }})</h2>
-        <ul>
-          <li v-for="post in store.posts.slice(0, 5)" :key="post.id">
-            {{ post.title }}
-          </li>
-        </ul>
+      <ion-item>
+        <ion-label position="stacked">Correo (rafael20031920)</ion-label>
+        <ion-input v-model="form.email" type="email"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Contraseña (maximilianocortez)</ion-label>
+        <ion-input v-model="form.password" type="password"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" class="ion-margin-top" @click="handleLogin" :disabled="store.cargando">
+        {{ store.cargando ? 'Verificando...' : 'Iniciar Sesión' }}
+      </ion-button>
+
+      <div v-if="store.token" style="margin-top: 20px; color: green; text-align: center;">
+        <p><b>¡Login Exitoso!</b></p>
+        <p>Token: {{ store.token }}</p>
       </div>
     </ion-content>
   </ion-app>
 </template>
+
 <script setup lang="ts">
-
+import { ref } from 'vue';
+import { IonApp, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon } from '@ionic/vue';
 import { useDataStore } from './features/data/dataStore';
-
-
 const store = useDataStore();
-store.obtenerDatos();
-</script>
+const form = ref({ email: '', password: '' });
 
+const handleLogin = async () => {
+  const res = await store.login(form.value);
+  if (!res.success) {
+    alert("Error: " + res.error);
+  }
+};
+</script>
