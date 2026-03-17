@@ -1,28 +1,26 @@
 <template>
   <ion-app>
     <ion-content class="ion-padding">
-      <div style="text-align: center; margin-top: 40px;">
-        <ion-icon name="person-circle" style="font-size: 80px;"></ion-icon>
-        <h1>Actividad 3: Login</h1>
-      </div>
+      <div style="max-width: 450px; margin: 40px auto; text-align: center;">
+        <ion-icon name="hardware-chip-outline" style="font-size: 60px; color: #3880ff;"></ion-icon>
+        <h1>Prueba de Hardware</h1>
+        <p>GPS y Cámara - Proyecto TESA</p>
 
-      <ion-item>
-        <ion-label position="stacked">Correo (rafael20031920)</ion-label>
-        <ion-input v-model="form.email" type="email"></ion-input>
-      </ion-item>
+        <ion-button expand="block" color="primary" @click="tomarFoto" class="ion-margin-top">
+          <ion-icon slot="start" name="camera"></ion-icon>
+          PROBAR CÁMARA
+        </ion-button>
 
-      <ion-item>
-        <ion-label position="stacked">Contraseña (maximilianocortez)</ion-label>
-        <ion-input v-model="form.password" type="password"></ion-input>
-      </ion-item>
+        <ion-button expand="block" color="secondary" class="ion-margin-top" @click="obtenerGPS">
+          <ion-icon slot="start" name="location"></ion-icon>
+          PROBAR GPS
+        </ion-button>
 
-      <ion-button expand="block" class="ion-margin-top" @click="handleLogin" :disabled="store.cargando">
-        {{ store.cargando ? 'Verificando...' : 'Iniciar Sesión' }}
-      </ion-button>
-
-      <div v-if="store.token" style="margin-top: 20px; color: green; text-align: center;">
-        <p><b>¡Login Exitoso!</b></p>
-        <p>Token: {{ store.token }}</p>
+        <div v-if="coords" style="margin-top: 25px; padding: 15px; border: 2px dashed #3880ff; border-radius: 10px; background: #f4f5f8;">
+          <p style="color: #3880ff;"><b>📍 Ubicación Detectada:</b></p>
+          <p><b>Latitud:</b> {{ coords.lat }}</p>
+          <p><b>Longitud:</b> {{ coords.lng }}</p>
+        </div>
       </div>
     </ion-content>
   </ion-app>
@@ -30,15 +28,38 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonApp, IonContent, IonItem, IonLabel, IonInput, IonButton, IonIcon } from '@ionic/vue';
-import { useDataStore } from './features/data/dataStore';
-const store = useDataStore();
-const form = ref({ email: '', password: '' });
+import { IonApp, IonContent, IonButton, IonIcon } from '@ionic/vue';
+import { Camera, CameraResultType } from '@capacitor/camera';
+import { Geolocation } from '@capacitor/geolocation';
 
-const handleLogin = async () => {
-  const res = await store.login(form.value);
-  if (!res.success) {
-    alert("Error: " + res.error);
+const coords = ref<{lat: number, lng: number} | null>(null);
+
+const tomarFoto = async () => {
+  try {
+    await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+    alert("¡Cámara activada correctamente!");
+  } catch (e) {
+    console.log("Cámara cerrada o cancelada");
+  }
+};
+
+const obtenerGPS = async () => {
+  try {
+    const position = await Geolocation.getCurrentPosition();
+    coords.value = {
+      lat: position.coords.latitude,
+      lng: position.coords.longitude
+    };
+  } catch (e) {
+    alert("Error al obtener GPS. Asegúrate de dar permisos en el navegador.");
   }
 };
 </script>
+
+<style scoped>
+h1 { font-weight: bold; color: #1e1e1e; }
+</style>
